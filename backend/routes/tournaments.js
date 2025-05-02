@@ -6,7 +6,7 @@
 /*   By: mpellegr <mpellegr@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:59:55 by jmakkone          #+#    #+#             */
-/*   Updated: 2025/04/29 15:00:09 by mpellegr         ###   ########.fr       */
+/*   Updated: 2025/05/02 16:47:10 by mpellegr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ const TournamentPlayers = {
 		id: { type: 'integer' },
 		tournament_id: { type: 'integer' },
 		user_id: { type: 'integer' },
-		// seed: { type: 'integer' },
+		username: { type: 'string' },
 	}
 }
 
@@ -166,7 +166,7 @@ function tournamentRoutes(fastify, options, done) {
 	}
 
 	const infoTournamentsSchema = {
-		// onRequest: [fastify.authenticate],
+		onRequest: [fastify.authenticate],
 		schema: {
 			response: {
 				200: { type: 'array', items: TournamentPlayers },
@@ -178,7 +178,7 @@ function tournamentRoutes(fastify, options, done) {
 	}
 
 	fastify.get('/tournament/list', listTournamentsSchema)
-	fastify.get('/tournament/:id/info', infoTournamentsSchema)
+	fastify.get('/tournament/info', infoTournamentsSchema)
 	fastify.post('/tournament/new', createTournamentSchema)
 	fastify.post('/tournament/:id/join', joinTournamentSchema)
 	fastify.post('/tournament/:id/start', startTournamentSchema)

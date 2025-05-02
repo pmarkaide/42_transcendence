@@ -81,8 +81,9 @@ const JoinButton = styled.button`
 
 interface MatchLobby {
 	id: number;
-	creator_id: string;
-	player_count: number;
+	tournament_id: number;
+	user_id: number;
+	username: string;
 }
 
 const GameLobby: React.FC = () => {
@@ -94,7 +95,7 @@ const GameLobby: React.FC = () => {
 	useEffect(() => {
 		const loadMatches = async () => {
 			try {
-				const response = await customFetch.get<MatchLobby[]>('tournament/1/info');
+				const response = await customFetch.get<MatchLobby[]>('tournament/info');
 				console.log(response)
 				setMatches(response.data);
 			} catch (err: unknown) {
@@ -108,6 +109,10 @@ const GameLobby: React.FC = () => {
 		};
 
 		loadMatches();
+
+		const interval = setInterval(loadMatches, 5000);
+
+		return () => clearInterval(interval); // Cleanup on unmount
 	}, []); // empty deps = run once on mount
 
 	// const handleJoin = async (matchId: number) => {
@@ -135,7 +140,7 @@ const GameLobby: React.FC = () => {
 				) : (
 					matches.map((match) => (
 						<MatchItem key={match.id}>
-							Player Id: {match.user_id}
+							Player{match.user_id}: {match.username} - Tournament #{match.tournament_id}
 							{/* <JoinButton onClick={() => handleJoin(match.id)}>Join</JoinButton> */}
 						</MatchItem>
 					))

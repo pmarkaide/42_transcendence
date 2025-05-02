@@ -6,7 +6,7 @@
 /*   By: mpellegr <mpellegr@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:51:28 by jmakkone          #+#    #+#             */
-/*   Updated: 2025/04/29 14:59:58 by mpellegr         ###   ########.fr       */
+/*   Updated: 2025/05/02 16:56:26 by mpellegr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ function isPowerOfTwo(n) {
 const createTournament = async (request, reply) => {
 	const { name } = request.body;
 	const ownerId = request.user.id;
+	const ownerUsername = request.user.username;
 	try {
 		const tournamentId = await new Promise((resolve, reject) => {
 			db.run(
@@ -46,8 +47,8 @@ const createTournament = async (request, reply) => {
 		});
 		await new Promise((resolve, reject) => {
 			db.run(
-				'INSERT INTO tournament_players (tournament_id, user_id) VALUES (?, ?)',
-				[tournamentId, ownerId],
+				'INSERT INTO tournament_players (tournament_id, user_id, username) VALUES (?, ?, ?)',
+				[tournamentId, ownerId, ownerUsername],
 				function (err) {
 					if (err) return reject(err);
 					resolve();
@@ -76,6 +77,7 @@ const createTournament = async (request, reply) => {
 const joinTournament = async (request, reply) => {
 	const tournamentId = Number(request.params.id);
 	const userId = request.user.id;
+	const username = request.user.username
 	try {
 		const tour = await new Promise((resolve, reject) => {
 			db.get('SELECT status FROM tournaments WHERE id = ?', [tournamentId], (err, row) => {
@@ -91,8 +93,8 @@ const joinTournament = async (request, reply) => {
 		}
 		await new Promise((resolve, reject) => {
 			db.run(
-				'INSERT INTO tournament_players (tournament_id, user_id) VALUES (?, ?)',
-				[tournamentId, userId],
+				'INSERT INTO tournament_players (tournament_id, user_id, username) VALUES (?, ?, ?)',
+				[tournamentId, userId, username],
 				function (err) {
 					if (err) return reject(err);
 					resolve();
@@ -277,10 +279,21 @@ const listTournaments = async (request, reply) => {
 };
 
 const infoTournament = async (request, reply) => {
-	const tournamentId = Number(request.params.id);
+	const userId = request.user.id
+	console.log(userId)
+	// const tournamentId = Number(request.params.id);
 	try {
+		const tournament = await new Promise((resolve, reject) => {
+			db.get('SELECT id FROM tournaments ORDER BY id DESC LIMIT 1', (err, row) => {
+				if (err)
+					return reject(err)
+				resolve(row)
+			})
+		})
+		const tournamentId = tournament.id
+		console.log(tournamentId)
 		const users = await new Promise((resolve, reject) => {
-			db.all('SELECT id, tournament_id, user_id, seed FROM tournament_players WHERE tournament_id = ?', [tournamentId], (err, rows) => {
+			db.all('SELECT id, tournament_id, user_id, username FROM tournament_players WHERE tournament_id = ?', [tournamentId], (err, rows) => {
 				if (err) return reject(err);
 				resolve(rows);
 			});

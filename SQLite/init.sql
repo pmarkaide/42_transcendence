@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS tournament_players (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	tournament_id INTEGER NOT NULL,
 	user_id INTEGER NOT NULL,
+	username TEXT,
 	seed INTEGER,
 	FOREIGN KEY (tournament_id) REFERENCES tournaments(id) ON DELETE CASCADE,
 	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
